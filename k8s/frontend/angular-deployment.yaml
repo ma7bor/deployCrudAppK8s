@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: angular-deployment
+  namespace: ams-app
+  labels:
+    app: angular-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: angular-app
+  template:
+    metadata:
+      labels:
+        app: angular-app
+    spec:
+      containers:
+      - name: angular-app
+        image: nawkoch/amsfront2024:v1.7
+        ports:
+        - containerPort: 80
+        env:
+          - name: API_URL
+            value: "http://spring-service:8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: angular-service
+  namespace: ams-app
+spec:
+  selector:
+    app: angular-app
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP

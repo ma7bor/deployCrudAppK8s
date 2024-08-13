@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-deployment
+  namespace: ams-app
+  labels:
+    app: spring-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-app
+  template:
+    metadata:
+      labels:
+        app: spring-app
+    spec:
+      containers:
+      - name: spring-app
+        image: nawkoch/am-spring-rest2024:v1.0
+        resources:
+          limits:
+            memory: "800Mi"
+            cpu: "1"
+          requests:
+            memory: "600Mi"
+            cpu: "0.5"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: spring-secrets
+              key: user-username
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: spring-secrets
+              key: user-password
+        - name: MYSQL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: spring-configmap  # Corrected double colon to single colon
+              key: db-host
+        - name: MYSQL_DBNAME
+          valueFrom:
+            configMapKeyRef:
+              name: spring-configmap
+              key: db-name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-service
+  namespace: ams-app
+spec:
+  selector:
+    app: spring-app
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    nodePort: 30150

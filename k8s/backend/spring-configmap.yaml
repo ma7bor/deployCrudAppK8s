@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-configmap
+  namespace: ams-app
+data:
+  db-name: amsdbrest2024
+  db-host: mysql-service.ams-app.svc.cluster.local
